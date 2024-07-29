@@ -1,5 +1,5 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app"
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 // TODO: Add SDKs for Firebase products that you want to use
@@ -13,7 +13,7 @@ const firebaseConfig = {
   storageBucket: "firestreamapp-9d296.appspot.com",
   messagingSenderId: "922934519924",
   appId: "1:922934519924:web:a1441e771c2e6cfbb04921"
-};
+}
 
 // Initialize Firebase
 export const FIREBASE_APP = initializeApp(firebaseConfig)

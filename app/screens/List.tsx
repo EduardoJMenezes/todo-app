@@ -2,13 +2,13 @@ import { View, Text, Button, StyleSheet, TextInput, FlatList, TouchableOpacity }
 import React, { useEffect, useState } from 'react'
 import { FIRESTORE_DB } from '../../firebaseConfig'
 import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore'
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { Entypo } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { Entypo } from '@expo/vector-icons'
 
 export interface Todo {
-    title: string;
-    done: boolean;
-    id: string;
+    title: string
+    done: boolean
+    id: string
 }
 
 const List = ({ navigation }: any) => {
@@ -19,7 +19,7 @@ const List = ({ navigation }: any) => {
 
         const subscriber = onSnapshot(todoRef, {
             next: (snapshot) => {
-                console.log('UPPDATED')
+                console.log('UPDATED')
                 const todos: Todo[] = []
                 snapshot.docs.forEach((doc) => {
                     console.log(doc.data())
@@ -76,7 +76,7 @@ const List = ({ navigation }: any) => {
     )
 }
 
-export default List;
+export default List
 
 const styles = StyleSheet.create({
     container: {
