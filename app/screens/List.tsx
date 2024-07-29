@@ -1,7 +1,7 @@
 import { View, Text, Button, StyleSheet, TextInput, FlatList, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { FIRESTORE_DB } from '../../firebaseConfig'
-import { addDoc, collection, onSnapshot } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Entypo } from '@expo/vector-icons';
 
@@ -41,18 +41,19 @@ const List = ({ navigation }: any) => {
     }
 
     const renderTodo = ({item}: any) => {
+        const ref = doc(FIRESTORE_DB, `todos/${item.id}`)
         const toggleDone = async() => {
-
+            updateDoc(ref, { done: !item.done})
         }
 
         const deleteItem = async() => {
-            
+            deleteDoc(ref)
         }
         return (
             <View style={styles.todoContainer}>
                 <TouchableOpacity onPress={toggleDone} style={styles.todo}>
-                    {item.done && <Ionicons name="checkmark-circle" />}
-                    {!item.done && <Entypo name="circle" size={24} color="black" />}
+                    {item.done && <Ionicons name="checkmark-circle" size={32} color="green"  />}
+                    {!item.done && <Entypo name="circle" size={32} color="black" />}
                     <Text style={styles.todoText}>{item.title}</Text>
                 </TouchableOpacity>
                 <Ionicons name="trash-bin-outline" size={24} color="red" onPress={deleteItem} />
@@ -63,7 +64,7 @@ const List = ({ navigation }: any) => {
     return (
         <View style={styles.container}>
             <View style={styles.form}>
-                <TextInput placeholder="Add new Todo" onChangeText={(text: string) => setTodo(text)} value={todo} />
+                <TextInput style={styles.input} placeholder="Add new Todo" onChangeText={(text: string) => setTodo(text)} value={todo} />
                 <Button onPress={addTodo} title="Add Todo" disabled={todo === ''} />
             </View>
             {todos.length > 0 && (
@@ -103,6 +104,7 @@ const styles = StyleSheet.create({
     },
     todoText: {
         flex: 1,
+        paddingHorizontal: 4
     },
     todo: {
         flex: 1,
