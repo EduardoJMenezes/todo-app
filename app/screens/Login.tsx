@@ -1,5 +1,5 @@
 import { View, TextInput, Button, StyleSheet, Alert } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, Fragment } from 'react'
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { useNavigation } from '@react-navigation/native'
 import { FIREBASE_APP } from '../../firebaseConfig'
@@ -15,7 +15,7 @@ const Login = () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password)
       Alert.alert('Success', 'Account created successfully! Try login now.')
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert('Error', error.message)
     }
   }
@@ -25,13 +25,13 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, email, password)
       Alert.alert('Success', 'Signed in successfully!')
       navigation.navigate('My Todos')
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert('Error', error.message)
     }
   }
 
   return (
-    <View style={styles.container}>
+    <Fragment >
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -54,7 +54,7 @@ const Login = () => {
       <View style={styles.button}>
         <Button onPress={signIn} title="Sign in" />
       </View>
-    </View>
+    </Fragment>
   )
 }
 

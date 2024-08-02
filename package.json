@@ -11,8 +11,11 @@
   "dependencies": {
     "@expo/config": "^8.1.1",
     "@expo/metro-config": "^0.10.0",
+    "@react-native-community/datetimepicker": "^8.2.0",
+    "@react-native-picker/picker": "^2.7.7",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.10.0",
+    "date-fns": "^3.6.0",
     "expo": "~51.0.20",
     "expo-status-bar": "~1.12.1",
     "firebase": "^10.12.3",
