@@ -1,11 +1,12 @@
-import { View, Text, Button, StyleSheet, TextInput, FlatList, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState, Fragment } from 'react'
+import { View, Text, Button, StyleSheet, TextInput, FlatList, TouchableOpacity, Modal, Alert } from 'react-native'
 import { FIRESTORE_DB } from '../../firebaseConfig'
 import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { Entypo } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { format } from 'date-fns'
+import { CalendarList } from 'react-native-calendars'
 
 export interface Todo {
     title: string
@@ -21,6 +22,8 @@ const List = ({ navigation }: any) => {
     const [date, setDate] = useState(new Date())
     const [showDatePicker, setShowDatePicker] = useState(false)
     const [showTimePicker, setShowTimePicker] = useState(false)
+    const [showCalendar, setShowCalendar] = useState(false)
+    const [markedDates, setMarkedDates] = useState({})
 
     useEffect(() => {
         const todoRef = collection(FIRESTORE_DB, 'todos')
@@ -41,6 +44,20 @@ const List = ({ navigation }: any) => {
         })
         return () => subscriber()
     }, [])
+
+    useEffect(() => {
+        const dates = todos.reduce((acc: any, todo: Todo) => {
+            const date = todo.datetime.split('T')[0]
+            if (acc[date]) {
+                acc[date].dots.push({ color: 'blue', selectedDotColor: 'blue' })
+            } else {
+                acc[date] = { dots: [{ color: 'blue', selectedDotColor: 'blue' }] }
+            }
+            return acc
+        }, {})
+
+        setMarkedDates(dates)
+    }, [todos])
 
     const addTodo = async () => {
         const doc = await addDoc(collection(FIRESTORE_DB, 'todos'), { title: todo, done: false, datetime: date.toISOString() })
@@ -89,40 +106,18 @@ const List = ({ navigation }: any) => {
                     onChangeText={(text: string) => setTodo(text)}
                     value={todo}
                 />
-                <Button onPress={() => setShowDatePicker(true)} title="Pick Date" />
-                {showDatePicker && (
-                    <DateTimePicker
-                        value={date}
-                        mode="date"
-                        display="default"
-                        onChange={(event, selectedDate) => {
-                            setShowDatePicker(false)
-                            if (selectedDate) {
-                                setDate(new Date(selectedDate.setHours(date.getHours(), date.getMinutes())))
-                                setShowTimePicker(true)
-                            }
-                        }}
-                    />
-                )}
-                {showTimePicker && (
-                    <DateTimePicker
-                        value={date}
-                        mode="time"
-                        display="default"
-                        onChange={(event, selectedTime) => {
-                            setShowTimePicker(false)
-                            if (selectedTime) {
-                                const currentDate = new Date(date)
-                                currentDate.setHours(selectedTime.getHours(), selectedTime.getMinutes())
-                                setDate(currentDate)
-                            }
-                        }}
-                    />
-                )}
-                <Button onPress={addTodo} title="Add Todo" disabled={todo === ''} />
+                <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.iconButton}>
+                    <Ionicons name="time-outline" size={24} color="white" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={addTodo} style={styles.iconButton}>
+                    <Ionicons name="add-circle-outline" size={24} color="white" />
+                </TouchableOpacity>
             </View>
+            <TouchableOpacity onPress={() => setShowCalendar(true)} style={styles.calendarButton}>
+                <Ionicons name="calendar-outline" size={24} color="white" />
+            </TouchableOpacity>
             {todos.length > 0 && (
-                <View>
+                <View style={styles.listContainer}>
                     <FlatList
                         data={todos}
                         renderItem={(item) => renderTodo(item)}
@@ -130,6 +125,50 @@ const List = ({ navigation }: any) => {
                     />
                 </View>
             )}
+            {showDatePicker && (
+                <DateTimePicker
+                    value={date}
+                    mode="date"
+                    display="default"
+                    onChange={(event, selectedDate) => {
+                        setShowDatePicker(false)
+                        if (selectedDate) {
+                            setDate(new Date(selectedDate.setHours(date.getHours(), date.getMinutes())))
+                            setShowTimePicker(true)
+                        }
+                    }}
+                />
+            )}
+            {showTimePicker && (
+                <DateTimePicker
+                    value={date}
+                    mode="time"
+                    display="default"
+                    onChange={(event, selectedTime) => {
+                        setShowTimePicker(false)
+                        if (selectedTime) {
+                            const currentDate = new Date(date)
+                            currentDate.setHours(selectedTime.getHours(), selectedTime.getMinutes())
+                            setDate(currentDate)
+                        }
+                    }}
+                />
+            )}
+            <Modal visible={showCalendar} animationType="slide">
+                <View style={styles.modalContainer}>
+                    <Button title="Close" onPress={() => setShowCalendar(false)} />
+                    <CalendarList
+                        markingType={'multi-dot'}
+                        markedDates={markedDates}
+                        onDayPress={(day) => {
+                            const todosForDay = todos.filter(todo => todo.datetime.startsWith(day.dateString))
+                            if (todosForDay.length > 0) {
+                                Alert.alert('Todos', todosForDay.map(todo => todo.title).join('\n'))
+                            }
+                        }}
+                    />
+                </View>
+            </Modal>
         </Fragment>
     )
 }
@@ -153,6 +192,25 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff'
     },
+    iconButton: {
+        marginLeft: 10,
+        backgroundColor: '#007bff',
+        padding: 10,
+        borderRadius: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    calendarButton: {
+        backgroundColor: '#007bff',
+        padding: 10,
+        borderRadius: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    listContainer: {
+        marginTop: 10,
+    },
     todoContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -172,5 +230,9 @@ const styles = StyleSheet.create({
     todoDatetime: {
         fontSize: 12,
         color: 'gray'
-    }
+    },
+    modalContainer: {
+        flex: 1,
+        padding: 20,
+    },
 })
