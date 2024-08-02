@@ -12,6 +12,7 @@ export interface Todo {
     done: boolean
     id: string
     datetime: string
+    description?: string
 }
 
 const List = ({ navigation }: any) => {
@@ -57,15 +58,22 @@ const List = ({ navigation }: any) => {
         const deleteItem = async () => {
             deleteDoc(ref)
         }
+
+        const navigateToDetails = () => {
+            navigation.navigate('Details', { id: item.id })
+        }
+
         return (
             <View style={styles.todoContainer}>
                 <TouchableOpacity onPress={toggleDone} style={styles.todo}>
                     {item.done && <Ionicons name="checkmark-circle" size={32} color="green" />}
                     {!item.done && <Entypo name="circle" size={32} color="black" />}
-                    <View>
-                        <Text style={styles.todoText}>{item.title}</Text>
-                        <Text style={styles.todoDatetime}>{format(new Date(item.datetime), 'dd/MM/yyyy HH:mm')}</Text>
-                    </View>
+                    <TouchableOpacity onPress={navigateToDetails}>
+                        <View>
+                            <Text style={styles.todoText}>{item.title}</Text>
+                            <Text style={styles.todoDatetime}>{format(new Date(item.datetime), 'dd/MM/yyyy HH:mm')}</Text>
+                        </View>
+                    </TouchableOpacity>
                 </TouchableOpacity>
                 <Ionicons name="trash-bin-outline" size={24} color="red" onPress={deleteItem} />
             </View>
