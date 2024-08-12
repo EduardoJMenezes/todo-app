@@ -23,9 +23,9 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator 
         initialRouteName={authenticated ? "My Todos" : "Login"}
-        // screenOptions={{
-        //   orientation: 'default',
-        // }}
+        screenOptions={{
+          orientation: 'default',
+        }}
       >
         <Stack.Screen name="My Todos" component={List} />
         <Stack.Screen name="Login" component={Login} />
