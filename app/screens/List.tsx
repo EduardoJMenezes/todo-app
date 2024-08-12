@@ -60,20 +60,6 @@ const List = ({ navigation }: any) => {
         setMarkedDates(dates)
     }, [todos])
 
-    useEffect(() => {
-        const handleOrientationChange = ({ window }: { window: { width: number; height: number } }) => {
-            if (window.width > window.height) {
-                setOrientation('landscape')
-            } else {
-                setOrientation('portrait')
-            }
-        }
-
-        const subscription = Dimensions.addEventListener('change', handleOrientationChange)
-
-        return () => subscription?.remove()
-    }, [orientation])
-
     const addTodo = async () => {
         const doc = await addDoc(collection(FIRESTORE_DB, 'todos'), { title: todo, done: false, datetime: date.toISOString() })
         setTodo('')
