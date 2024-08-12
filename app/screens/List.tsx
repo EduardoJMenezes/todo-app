@@ -1,5 +1,5 @@
-import React, { useEffect, useState, Fragment } from 'react'
-import { View, Text, Button, StyleSheet, TextInput, FlatList, TouchableOpacity, Modal, Alert } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, Button, StyleSheet, TextInput, FlatList, TouchableOpacity, Modal, Alert, Dimensions } from 'react-native'
 import { FIRESTORE_DB } from '../../firebaseConfig'
 import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore'
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -24,6 +24,7 @@ const List = ({ navigation }: any) => {
     const [showTimePicker, setShowTimePicker] = useState(false)
     const [showCalendar, setShowCalendar] = useState(false)
     const [markedDates, setMarkedDates] = useState({})
+    const [orientation, setOrientation] = useState('portrait')
 
     useEffect(() => {
         const todoRef = collection(FIRESTORE_DB, 'todos')
@@ -58,6 +59,20 @@ const List = ({ navigation }: any) => {
 
         setMarkedDates(dates)
     }, [todos])
+
+    useEffect(() => {
+        const handleOrientationChange = ({ window }: { window: { width: number; height: number } }) => {
+            if (window.width > window.height) {
+                setOrientation('landscape')
+            } else {
+                setOrientation('portrait')
+            }
+        }
+
+        const subscription = Dimensions.addEventListener('change', handleOrientationChange)
+
+        return () => subscription?.remove()
+    }, [])
 
     const addTodo = async () => {
         const doc = await addDoc(collection(FIRESTORE_DB, 'todos'), { title: todo, done: false, datetime: date.toISOString() })
@@ -98,7 +113,7 @@ const List = ({ navigation }: any) => {
     }
 
     return (
-        <Fragment>
+        <View style={orientation === 'portrait' ? styles.container : styles.containerLandscape}>
             <View style={styles.form}>
                 <TextInput
                     style={styles.input}
@@ -169,7 +184,7 @@ const List = ({ navigation }: any) => {
                     />
                 </View>
             </Modal>
-        </Fragment>
+        </View>
     )
 }
 
@@ -178,6 +193,9 @@ export default List
 const styles = StyleSheet.create({
     container: {
         marginHorizontal: 20,
+    },
+    containerLandscape: {
+        marginHorizontal: 40,
     },
     form: {
         marginVertical: 20,
