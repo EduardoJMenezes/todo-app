@@ -72,7 +72,7 @@ const List = ({ navigation }: any) => {
         const subscription = Dimensions.addEventListener('change', handleOrientationChange)
 
         return () => subscription?.remove()
-    }, [])
+    }, [orientation])
 
     const addTodo = async () => {
         const doc = await addDoc(collection(FIRESTORE_DB, 'todos'), { title: todo, done: false, datetime: date.toISOString() })
