@@ -6,6 +6,7 @@ import Details from './app/screens/Details'
 import { useEffect, useState } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { FIREBASE_AUTH } from './firebaseConfig'
+import React from 'react'
 
 const Stack = createNativeStackNavigator()
 
